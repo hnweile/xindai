@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.CreditdataforecastDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.CreditdataforecastEntity" id="creditdataforecastMap">
+        <result property="number" column="number"/>
+        <result property="age" column="age"/>
+        <result property="annualincome" column="annualincome"/>
+        <result property="totalassets" column="totalassets"/>
+        <result property="creditscore" column="creditscore"/>
+        <result property="totalliabilities" column="totalliabilities"/>
+        <result property="creditlimit" column="creditlimit"/>
+        <result property="loanamount" column="loanamount"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.CreditdataforecastVO" >
+		SELECT * FROM creditdataforecast  creditdataforecast         
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.CreditdataforecastVO" >
+		SELECT  creditdataforecast.* FROM creditdataforecast  creditdataforecast 	
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.CreditdataforecastView" >
+
+		SELECT  creditdataforecast.* FROM creditdataforecast  creditdataforecast 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.CreditdataforecastView" >
+		SELECT * FROM creditdataforecast  creditdataforecast <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+
+</mapper>

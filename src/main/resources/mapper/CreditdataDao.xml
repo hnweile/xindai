@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dao.CreditdataDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.entity.CreditdataEntity" id="creditdataMap">
+        <result property="number" column="number"/>
+        <result property="gender" column="gender"/>
+        <result property="age" column="age"/>
+        <result property="area" column="area"/>
+        <result property="educationlevel" column="educationlevel"/>
+        <result property="maritalstatus" column="maritalstatus"/>
+        <result property="householdsize" column="householdsize"/>
+        <result property="annualincome" column="annualincome"/>
+        <result property="monthlyincome" column="monthlyincome"/>
+        <result property="career" column="career"/>
+        <result property="yearsofservice" column="yearsofservice"/>
+        <result property="totalassets" column="totalassets"/>
+        <result property="totalliabilities" column="totalliabilities"/>
+        <result property="debtratio" column="debtratio"/>
+        <result property="creditlimit" column="creditlimit"/>
+        <result property="creditcardusagerate" column="creditcardusagerate"/>
+        <result property="creditscore" column="creditscore"/>
+        <result property="credithistorylength" column="credithistorylength"/>
+        <result property="numberofoverduetimes" column="numberofoverduetimes"/>
+        <result property="seriousoverduetimes" column="seriousoverduetimes"/>
+        <result property="overdueamount" column="overdueamount"/>
+        <result property="overduedays" column="overduedays"/>
+        <result property="creditinquiryfrequency" column="creditinquiryfrequency"/>
+        <result property="loanamount" column="loanamount"/>
+        <result property="loanterm" column="loanterm"/>
+        <result property="lendingrate" column="lendingrate"/>
+        <result property="repaymentmethod" column="repaymentmethod"/>
+        <result property="loanpurpose" column="loanpurpose"/>
+        <result property="remainingloanterm" column="remainingloanterm"/>
+    </resultMap>
+
+	<select id="selectListVO"
+		resultType="com.entity.vo.CreditdataVO" >
+		SELECT * FROM creditdata  creditdata         
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectVO"
+		resultType="com.entity.vo.CreditdataVO" >
+		SELECT  creditdata.* FROM creditdata  creditdata 	
+ 		<where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+
+    <select id="selectListView"
+		resultType="com.entity.view.CreditdataView" >
+
+		SELECT  creditdata.* FROM creditdata  creditdata 	        
+        <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+	<select id="selectView"
+		resultType="com.entity.view.CreditdataView" >
+		SELECT * FROM creditdata  creditdata <where> 1=1 ${ew.sqlSegment}</where>
+	</select>
+	
+
+    <select id="selectValue" resultType="map" >
+        SELECT ${params.xColumn}, ROUND(sum(${params.yColumn}),1) total FROM creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.xColumn}
+    </select>
+
+    <select id="selectTimeStatValue" resultType="map" >
+        <if test = 'params.timeStatType == "日"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m-%d') ${params.xColumn}, sum(${params.yColumn}) total FROM creditdata
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m-%d')
+        </if>
+        <if test = 'params.timeStatType == "月"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y-%m') ${params.xColumn}, sum(${params.yColumn}) total FROM creditdata
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y-%m')
+        </if>
+        <if test='params.timeStatType == "季"'>
+                SELECT CONCAT(YEAR(${params.xColumn}), ' - ', ELT(QUARTER(${params.xColumn}), '第一季度', '第二季度', '第三季度', '第四季度')) as ${params.xColumn}, sum(${params.yColumn}) total FROM orders
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by CONCAT(YEAR(${params.xColumn}), ' - ', ELT(QUARTER(${params.xColumn}), '第一季度', '第二季度', '第三季度', '第四季度'))
+        </if>
+        <if test = 'params.timeStatType == "年"'>
+                SELECT DATE_FORMAT(${params.xColumn},'%Y') ${params.xColumn}, sum(${params.yColumn}) total FROM creditdata
+                <where> 1=1 ${ew.sqlSegment}</where>
+                group by DATE_FORMAT(${params.xColumn},'%Y')
+        </if>
+    </select>
+
+    <select id="selectGroup" resultType="map" >
+        SELECT ${params.column} , count(1) total FROM creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        group by ${params.column}
+    </select>
+
+    <select id="ageSectionStat" resultType="map" >
+        SELECT '二十岁以下' as age,case when t.二十岁以下 is null then 0 else t.二十岁以下 end total
+        from
+        (select
+        sum(case when age &lt;= 19 then 1 else 0 end) as 二十岁以下,        sum(case when age >= 20 and age &lt;= 30 then 1 else 0 end) as 二十至三十岁,        sum(case when age >= 31 and age &lt;= 40 then 1 else 0 end) as 三十一至四十岁,        sum(case when age >= 41 and age &lt;= 50 then 1 else 0 end) as 四十一至五十岁,        sum(case when age >= 61 then 1 else 0 end) as 六十岁以上        from creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '二十至三十岁' as age,case when t.二十至三十岁 is null then 0 else t.二十至三十岁 end total
+        from
+        (select
+        sum(case when age &lt;= 19 then 1 else 0 end) as 二十岁以下,        sum(case when age >= 20 and age &lt;= 30 then 1 else 0 end) as 二十至三十岁,        sum(case when age >= 31 and age &lt;= 40 then 1 else 0 end) as 三十一至四十岁,        sum(case when age >= 41 and age &lt;= 50 then 1 else 0 end) as 四十一至五十岁,        sum(case when age >= 61 then 1 else 0 end) as 六十岁以上        from creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '三十一至四十岁' as age,case when t.三十一至四十岁 is null then 0 else t.三十一至四十岁 end total
+        from
+        (select
+        sum(case when age &lt;= 19 then 1 else 0 end) as 二十岁以下,        sum(case when age >= 20 and age &lt;= 30 then 1 else 0 end) as 二十至三十岁,        sum(case when age >= 31 and age &lt;= 40 then 1 else 0 end) as 三十一至四十岁,        sum(case when age >= 41 and age &lt;= 50 then 1 else 0 end) as 四十一至五十岁,        sum(case when age >= 61 then 1 else 0 end) as 六十岁以上        from creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '四十一至五十岁' as age,case when t.四十一至五十岁 is null then 0 else t.四十一至五十岁 end total
+        from
+        (select
+        sum(case when age &lt;= 19 then 1 else 0 end) as 二十岁以下,        sum(case when age >= 20 and age &lt;= 30 then 1 else 0 end) as 二十至三十岁,        sum(case when age >= 31 and age &lt;= 40 then 1 else 0 end) as 三十一至四十岁,        sum(case when age >= 41 and age &lt;= 50 then 1 else 0 end) as 四十一至五十岁,        sum(case when age >= 61 then 1 else 0 end) as 六十岁以上        from creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+        union all
+        SELECT '六十岁以上' as age,case when t.六十岁以上 is null then 0 else t.六十岁以上 end total
+        from
+        (select
+        sum(case when age &lt;= 19 then 1 else 0 end) as 二十岁以下,        sum(case when age >= 20 and age &lt;= 30 then 1 else 0 end) as 二十至三十岁,        sum(case when age >= 31 and age &lt;= 40 then 1 else 0 end) as 三十一至四十岁,        sum(case when age >= 41 and age &lt;= 50 then 1 else 0 end) as 四十一至五十岁,        sum(case when age >= 61 then 1 else 0 end) as 六十岁以上        from creditdata
+        <where> 1=1 ${ew.sqlSegment}</where>
+        ) t
+    </select>
+
+
+
+</mapper>
